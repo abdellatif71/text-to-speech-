@@ -66,3 +66,32 @@ Troubleshooting
 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+Requirements
+
+To use the Text-to-Speech functionality in this project, you need to have access to Google Cloud services. Specifically, the Google Cloud Text-to-Speech API is required.
+Steps to Enable Google Cloud Text-to-Speech
+
+    Create a Google Cloud Project:
+        Go to the Google Cloud Console.
+        Create a new project or use an existing one.
+
+    Enable the Text-to-Speech API:
+        In your Google Cloud project, navigate to APIs & Services > Library.
+        Search for "Text-to-Speech API" and click Enable.
+
+    Set Up Authentication:
+        Go to APIs & Services > Credentials.
+        Click on Create Credentials > Service Account.
+        Download the generated JSON file and save it securely.
+
+    Set the Environment Variable:
+        Ensure your system can locate the authentication file by setting the GOOGLE_APPLICATION_CREDENTIALS environment variable:
+
+        export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/credentials-file.json"
+
+        Replace path/to/your/credentials-file.json with the actual path to your JSON file.
+
+Notes
+
+    Billing Required: The Google Cloud Text-to-Speech API is not free. You need to have a billing account set up to use it.
+    Ensure you monitor usage to avoid unexpected costs.
