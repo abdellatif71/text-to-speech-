@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        h1 {
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text to Speech</h1>
+        <textarea id="textInput" placeholder="Type something here..."></textarea><br>
+        <button onclick="synthesizeText()">Speak</button>
+    </div>
+    <script>
+        async function synthesizeText() {
+            const text = document.getElementById('textInput').value;
+
+            if (!text) {
+                alert('Please enter text!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/synthesize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text,
+                        languageCode: 'de-DE', // Deutsch als Standardsprache
+                        voiceName: 'de-DE-Wavenet-A' // Deutsche Stimme
+                    }),
+                });
+
+                const data = await response.json();
+                if (data.fileName) {
+                    const audio = new Audio(`http://localhost:3000/${data.fileName}`);
+                    audio.play();
+                } else {
+                    alert('Failed to synthesize text.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while synthesizing text.');
+            }
+        }
+    </script>
+</body>
+</html>
+
