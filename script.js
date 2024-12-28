@@ -1,14 +1,13 @@
-// Get the input field and button elements
+// Warten, bis die Stimmen verfügbar sind
+let voices = [];
+
 const textInput = document.getElementById('text-input');
 const speakButton = document.getElementById('speak-button');
 
-// Get the available voices
-let voices = [];
-
+// Funktion, um Stimmen zu laden
 function loadVoices() {
     voices = speechSynthesis.getVoices();
     
-    // If no voices are available immediately, wait for them to load
     if (voices.length === 0) {
         speechSynthesis.onvoiceschanged = () => {
             voices = speechSynthesis.getVoices();
@@ -16,39 +15,48 @@ function loadVoices() {
     }
 }
 
-loadVoices(); // Load voices on script start
+// Stimmen beim Laden der Seite holen
+loadVoices();
 
+// Funktion zur Sprachsynthese
 speakButton.addEventListener('click', () => {
-    // Get the text from the input field
-    const text = textInput.value;
+    const text = textInput.value.trim();
 
-    // Check if the input is empty
-    if (!text.trim()) {
-        alert('Please enter some text!');
+    // Überprüfen, ob das Textfeld leer ist
+    if (text === '') {
+        alert('Bitte gib etwas Text ein!');
         return;
     }
 
-    // The utterance is created here with the text
-    const utterance = new SpeechSynthesisUtterance(text);
+    // Text in kleinere Abschnitte (Sätze) aufteilen
+    const sentences = text.split(/[.!?]/); // Teilt den Text an Satzzeichen wie Punkt, Ausrufezeichen oder Fragezeichen
 
-    // Choose the language (default is English)
-    const isGerman = text.match(/[\u00C0-\u017F]/); // Check for German characters
-    if (isGerman) {
-        utterance.lang = 'de-DE';
-    } else {
-        utterance.lang = 'en-US';
+    // Funktion, um die Sätze nacheinander vorzulesen
+    function speakSentence(index) {
+        if (index >= sentences.length) return; // Abbrechen, wenn alle Sätze vorgelesen wurden
+
+        const sentence = sentences[index].trim();
+        if (sentence === '') return speakSentence(index + 1); // Leerzeichen überspringen
+
+        const utterance = new SpeechSynthesisUtterance(sentence);
+
+        // Stimme festlegen (deutsch oder englisch)
+        utterance.voice = voices.find(voice => voice.lang === 'de-DE') || voices.find(voice => voice.lang === 'en-US');
+        
+        // Optional: Weitere Einstellungen für die Sprachausgabe (Tonhöhe, Geschwindigkeit)
+        utterance.pitch = 1.2; // Tonhöhe
+        utterance.rate = 1.0;  // Geschwindigkeit
+
+        // Wenn der Satz gesprochen wurde, den nächsten Satz starten
+        utterance.onend = () => speakSentence(index + 1);
+
+        // Sprachausgabe starten
+        speechSynthesis.speak(utterance);
     }
 
-    // Select the voice based on the language
-    const voice = voices.find(v => v.lang === utterance.lang);
-    if (voice) {
-        utterance.voice = voice;
-    }
-
-    // Optional: Set pitch and rate
-    utterance.pitch = 1.2;  // Range: 0 to 2
-    utterance.rate = 1.0;   // Range: 0.1 to 10
-
-    // Speak the text
-    speechSynthesis.speak(utterance);
+    // Den ersten Satz sprechen
+    speakSentence(0);
 });
+
+// Stimmen neu laden, wenn sie geändert werden
+speechSynthesis.onvoiceschanged = loadVoices;

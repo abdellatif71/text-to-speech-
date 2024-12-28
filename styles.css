@@ -21,8 +21,8 @@ p {
     border-radius: 5px;
     box-sizing: border-box;
     resize: vertical; /* Ermöglicht das manuelle Anpassen der Größe */
+    overflow-y: auto; /* Füge vertikalen Scrollbalken hinzu, wenn der Text zu lang ist */
 }
-
 #speak-button {
     width: 150px;
     height: 40px;
